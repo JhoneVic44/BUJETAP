@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>JhoneVic Bank · Dashboard</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    position: fixed;
+    inset: 0;
+    touch-action: manipulation;
+    background: #f2f4f7;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #111827;
+  }
+
+  .app {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ===== Top Bar ===== */
+  .top-bar {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #111827;
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    background: #111827;
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  /* Live Clock */
+  .live-clock {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-left: 8px;
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-size: 1.2rem;
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  /* ===== Balance Cards ===== */
+  .balance-section {
+    padding: 20px 20px 10px;
+    flex-shrink: 0;
+  }
+
+  /* Main Overall Balance Card */
+  .overall-card {
+    background: #111827;
+    border-radius: 20px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 10px 25px rgba(17, 24, 39, 0.15);
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .greeting {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .overall-amount {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .overall-amount.negative {
+    color: #fca5a5;
+  }
+
+  /* Split Balances Row */
+  .split-balances {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .mini-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    border: 1px solid #e5e7eb;
+  }
+
+  .mini-label {
+    font-size: 0.65rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .mini-amount {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ef4444;
+  }
+
+  /* ===== Input Section ===== */
+  .input-section {
+    padding: 10px 20px;
+    flex-shrink: 0;
+  }
+
+  .input-box {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    border: 1px solid #e5e7eb;
+  }
+
+  /* Toggle Switch */
+  .toggle-row {
+    display: flex;
+    background: #f3f4f6;
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 14px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .toggle-btn.active {
+    background: #ffffff;
+    color: #111827;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  /* Form Grid */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 90px 60px;
+    gap: 8px;
+    align-items: end;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .input-label {
+    font-size: 0.65rem;
+    color: #9ca3af;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .form-grid input {
+    padding: 14px 12px;
+    background: #f3f4f6;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font-size: 16px;
+    color: #111827;
+    outline: none;
+    transition: all 0.2s;
+    font-family: inherit;
+    width: 100%;
+    text-align: center;
+  }
+
+  .form-grid input:focus {
+    background: #ffffff;
+    border-color: #111827;
+    box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1);
+  }
+
+  .add-btn {
+    background: #111827;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .add-btn:active {
+    opacity: 0.8;
+  }
+
+  /* Remove number arrows */
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
+  input[type=number] { -moz-appearance: textfield; }
+
+  /* ===== History List ===== */
+  .history-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px 20px;
+    min-height: 0;
+  }
+
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .history-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: 100%;
+    text-align: center;
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: 0;
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .history-list {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    border: 1px solid #e5e7eb;
+  }
+
+  .history-list::-webkit-scrollbar { width: 4px; }
+  .history-list::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 4px; }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .history-item:last-child {
+    border-bottom: none;
+  }
+
+  .item-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .item-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-type {
+    font-size: 0.65rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+    margin-top: 2px;
+  }
+
+  .item-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .item-amount {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ef4444;
+  }
+
+  .del-btn {
+    background: none;
+    border: none;
+    color: #d1d5db;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+  }
+
+  .del-btn:active {
+    color: #ef4444;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.85rem;
+    padding: 32px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Top Navigation -->
+  <div class="top-bar">
+    <div class="brand">
+      <div class="brand-mark">J</div>
+      JhoneVic Bank
+      <div class="live-clock" id="liveClock">--:--</div>
+    </div>
+    <button class="back-btn" id="backBtn">✕</button>
+  </div>
+
+  <!-- Balances -->
+  <div class="balance-section">
+    <!-- Overall Balance -->
+    <div class="overall-card">
+      <!-- Changed this label to Total Balance -->
+      <div class="greeting">Total Balance</div>
+      <div class="overall-amount" id="overallBalanceDisplay">₱0.00</div>
+    </div>
+
+    <!-- Split Balances -->
+    <div class="split-balances">
+      <div class="mini-card">
+        <div class="mini-label">Expenses</div>
+        <div class="mini-amount" id="expensesDisplay">₱0.00</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-label">Daily Fare</div>
+        <div class="mini-amount" id="fareDisplay">₱0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="input-section">
+    <div class="input-box">
+      
+      <!-- Toggle -->
+      <div class="toggle-row">
+        <button class="toggle-btn active" id="toggleExpense">Expenses</button>
+        <button class="toggle-btn" id="toggleFare">Daily Fare</button>
+      </div>
+
+      <!-- Form -->
+      <div class="form-grid">
+        <div class="input-group">
+          <div class="input-label">Product</div>
+          <input type="text" id="itemName" placeholder="e.g. Coffee" autocomplete="off">
+        </div>
+        
+        <div class="input-group">
+          <div class="input-label">Amount</div>
+          <input type="number" id="itemAmount" placeholder="₱" step="0.01" inputmode="decimal">
+        </div>
+
+        <button class="add-btn" id="addBtn">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="history-section">
+    <div class="history-header">
+      <span class="history-title">Recent Transactions</span>
+      <button class="clear-btn" id="clearBtn">Clear</button>
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="empty-state">No transactions yet.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  let userName = '';
+  let startingBalance = 0;
+  let expenses = [];
+  let currentType = 'expense'; 
+  
+  const CURRENCY = '₱';
+
+  // DOM Elements
+  const backBtn = document.getElementById('backBtn');
+  const overallBalanceDisplay = document.getElementById('overallBalanceDisplay');
+  const expensesDisplay = document.getElementById('expensesDisplay');
+  const fareDisplay = document.getElementById('fareDisplay');
+  const liveClock = document.getElementById('liveClock');
+  
+  const toggleExpense = document.getElementById('toggleExpense');
+  const toggleFare = document.getElementById('toggleFare');
+  
+  const itemName = document.getElementById('itemName');
+  const itemAmount = document.getElementById('itemAmount');
+  const addBtn = document.getElementById('addBtn');
+  const historyList = document.getElementById('historyList');
+  const clearBtn = document.getElementById('clearBtn');
+
+  // Helpers
+  function formatMoney(n) {
+    return CURRENCY + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  
+  function totalExpenses() {
+    return expenses.filter(e => e.type === 'expense').reduce((s, e) => s + e.amount, 0);
+  }
+  
+  function totalFare() {
+    return expenses.filter(e => e.type === 'fare').reduce((s, e) => s + e.amount, 0);
+  }
+  
+  function overallBalance() {
+    return startingBalance - (totalExpenses() + totalFare());
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' +
+           d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Live Clock Function
+  function updateClock() {
+    const now = new Date();
+    liveClock.textContent = now.toLocaleTimeString(undefined, { 
+      hour: '2-digit', 
+      minute: '2-digit'
+    });
+  }
+
+  // Local Storage
+  function save() {
+    localStorage.setItem('jhonevicBank', JSON.stringify({ userName, startingBalance, expenses }));
+  }
+  
+  function load() {
+    try {
+      const raw = localStorage.getItem('jhonevicBank');
+      if (raw) {
+        const d = JSON.parse(raw);
+        userName = d.userName || '';
+        startingBalance = d.startingBalance || 0;
+        expenses = Array.isArray(d.expenses) ? d.expenses : [];
+      }
+    } catch (e) {}
+  }
+
+  // Render
+  function render() {
+    const overBalance = overallBalance();
+    
+    overallBalanceDisplay.textContent = formatMoney(overBalance);
+    overallBalanceDisplay.classList.toggle('negative', overBalance < 0);
+    
+    expensesDisplay.textContent = formatMoney(totalExpenses());
+    fareDisplay.textContent = formatMoney(totalFare());
+
+    if (expenses.length === 0) {
+      historyList.innerHTML = '<div class="empty-state">No transactions yet.</div>';
+    } else {
+      historyList.innerHTML = '';
+      [...expenses].sort((a, b) => b.id - a.id).forEach(exp => {
+        const row = document.createElement('div');
+        row.className = 'history-item';
+
+        const left = document.createElement('div');
+        left.className = 'item-left';
+        
+        const typeLabel = exp.type === 'fare' ? 'Daily Fare' : 'Expense';
+        
+        left.innerHTML = `
+          <div class="item-name">${exp.name}</div>
+          <div class="item-type">${typeLabel} · ${formatDate(exp.date)}</div>
+        `;
+
+        const right = document.createElement('div');
+        right.className = 'item-right';
+        
+        const amt = document.createElement('div');
+        amt.className = 'item-amount';
+        amt.textContent = '-' + formatMoney(exp.amount);
+        
+        const del = document.createElement('button');
+        del.className = 'del-btn';
+        del.innerHTML = '✕';
+        del.addEventListener('click', () => {
+          expenses = expenses.filter(e => e.id !== exp.id);
+          save();
+          render();
+        });
+
+        right.appendChild(amt);
+        right.appendChild(del);
+
+        row.appendChild(left);
+        row.appendChild(right);
+        historyList.appendChild(row);
+      });
+    }
+  }
+
+  // Actions
+  function setType(type) {
+    currentType = type;
+    if (type === 'expense') {
+      toggleExpense.classList.add('active');
+      toggleFare.classList.remove('active');
+      document.querySelector('.input-label').textContent = 'Product';
+      itemName.placeholder = 'e.g. Coffee';
+    } else {
+      toggleFare.classList.add('active');
+      toggleExpense.classList.remove('active');
+      document.querySelector('.input-label').textContent = 'Fare Type';
+      itemName.placeholder = 'e.g. Jeep/Tricycle';
+    }
+  }
+
+  function addTransaction() {
+    const name = itemName.value.trim();
+    const amt = parseFloat(itemAmount.value);
+
+    if (!name) { itemName.focus(); return; }
+    if (isNaN(amt) || amt <= 0) { itemAmount.focus(); return; }
+
+    expenses.push({
+      id: Date.now(),
+      name: name,
+      amount: amt,
+      type: currentType,
+      date: new Date().toISOString()
+    });
+
+    itemName.value = '';
+    itemAmount.value = '';
+    itemName.blur();
+    itemAmount.blur();
+    save();
+    render();
+  }
+
+  function clearAll() {
+    if (!confirm('Clear all transactions? Your starting balance will be kept.')) return;
+    expenses = [];
+    save();
+    render();
+  }
+
+  // Event Listeners
+  backBtn.addEventListener('click', () => {
+    window.location.href = 'index.html'; 
+  });
+
+  toggleExpense.addEventListener('click', () => setType('expense'));
+  toggleFare.addEventListener('click', () => setType('fare'));
+
+  addBtn.addEventListener('click', addTransaction);
+  itemName.addEventListener('keypress', e => { if (e.key === 'Enter') itemAmount.focus(); });
+  itemAmount.addEventListener('keypress', e => { if (e.key === 'Enter') addTransaction(); });
+
+  clearBtn.addEventListener('click', clearAll);
+
+  // Init
+  load();
+  render();
+  
+  // Start the live clock
+  updateClock();
+  setInterval(updateClock, 1000);
+})();
+</script>
+
+</body>
+</html>
